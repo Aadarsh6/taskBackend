@@ -4,8 +4,8 @@ import { createTask, deleteTask, getTask, updateTask } from "./controllers/task.
 
 const route = Router()
 
-route.post("/api/auth/login", login)
 route.post("/api/auth/signup", signup)
+route.post("/api/auth/login", login)
 
 
 route.post("/api/tasks", createTask)
