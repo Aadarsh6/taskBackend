@@ -14,7 +14,6 @@ export const signup = async( req: Request, res: Response )=>{
             where: {email:email}
         })
         if(existingUser){
-            console.log("User already exist");
             console.log("response 1");
            return res.status(409).json({ message: "User already exists" })
         }
@@ -60,7 +59,36 @@ export const signup = async( req: Request, res: Response )=>{
     
 }
 
-export const login = async(  )=>{
-    console.log("hello");
-    
+export const login = async( req: Request, res: Response )=>{
+    const { email, password } = req.body
+    try {
+        const existingUser = await prisma.user.findUnique({
+            where: {email: email}
+        })
+        if(!existingUser) return res.status(404).json({existingUser, message: "User with this email does not exist"})
+
+
+//!Password verification
+
+  
+        const passwordVerify = await bcrypt.compare(password, existingUser?.password!)
+
+        if(!passwordVerify){
+            return res.status(401).json({message: "Invalid credentials"})
+        }
+
+        //!jwt sign
+
+        const token = jwt.sign({
+            userId: existingUser?.id
+        },
+        process.env.JWT_SECRET!,
+        {expiresIn: "7d"}
+    )
+
+    res.json({token, id: existingUser?.id, name: existingUser?.name, email: existingUser?.email})
+        
+    } catch (error) {
+        res.status(500).json({message: "Error finding the user", error})
+    }
 }
