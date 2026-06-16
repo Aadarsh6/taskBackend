@@ -1,10 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken"
+import type { AuthRequest } from "../types/types.js";
 
 
-interface AuthRequest extends Request{
-    userId? : string
-}
 
 
 export function authMiddleware(req:AuthRequest, res:Response, next:NextFunction){
