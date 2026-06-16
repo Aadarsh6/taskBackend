@@ -43,7 +43,7 @@ export const getTask = async (req: AuthRequest, res: Response)=>{
 export const updateTask = async (req: AuthRequest, res: Response)=>{
 
     const taskId = req.params.id as string
-    const newTask = req.body.task
+    const {newTask, taskStatus} = req.body.task
     if(!newTask){
             return res.status(401).json({ message: "Can not get the task" })
 
@@ -78,12 +78,12 @@ export const deleteTask = async (req: AuthRequest, res: Response)=>{
     const taskId = req.params.id as string
 
     try {
-        const verifyUser = await prisma.task.findUnique({
+        const task = await prisma.task.findUnique({
             where: { id:taskId }
         })
-        if(!verifyUser) return res.status(404).json({message: "cant't get the task"})
+        if(!task) return res.status(404).json({message: "cant't get the task"})
 
-        if(verifyUser.id !== req.userId){
+        if(task.userId !== req.userId){
             return res.status(403).json({message: "Not authorized to delete this task"})
         }
             
