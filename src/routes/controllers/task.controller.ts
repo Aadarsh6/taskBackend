@@ -43,28 +43,34 @@ export const getTask = async (req: AuthRequest, res: Response)=>{
 export const updateTask = async (req: AuthRequest, res: Response)=>{
 
     const taskId = req.params.id as string
-    const {newTask, taskStatus} = req.body.task
-    if(!newTask){
-            return res.status(401).json({ message: "Can not get the task" })
+    const {task, taskStatus} = req.body
+
+    const updateData: {task?: string, taskStatus?:boolean} = {}
+
+    if(task !== undefined) updateData.task = task
+    if(taskStatus !== undefined) updateData.taskStatus = taskStatus
+
+    if(Object.keys(updateData).length === 0){
+            return res.status(401).json({ message: "Nothing to update" })
 
     }
     
     try {
-        const task = await prisma.task.findUnique({
+        const existingTask = await prisma.task.findUnique({
             where: { id: taskId }
         })
 
-        if(!task){
+        if(!existingTask){
             return res.status(404).json({message: "Task not found"})
         }
 
-        if(task.userId !== req.userId){
+        if(existingTask.userId !== req.userId){
             return res.status(403).json({message: "Not authorized to update this task"})
         }
 
         const updateTask = await prisma.task.update({
             where: {id: taskId},
-            data:{task: newTask}
+            data: updateData
         }) 
         res.json(updateTask)
     } catch (error) {
