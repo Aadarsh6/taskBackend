@@ -20,7 +20,7 @@ export const createTask = async (req:AuthRequest , res: Response)=>{
         })
         console.log(newTask);
         
-        res.json({newTask})
+        res.json(newTask)
     } catch (error) {
         res.status(500).json({message: "Can't create the task"})
     }
